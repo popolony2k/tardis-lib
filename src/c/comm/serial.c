@@ -68,7 +68,7 @@ void* __SerialThreadLoop( void *pArg )  {
 
     // Event handling
     if( FD_ISSET( pDev -> nDevFd, &readfs ) && pDev -> pReceiveSerialFn )
-      pDev -> pReceiveSerialFn( pDev -> nDevFd );
+      pDev -> pReceiveSerialFn( pDev );
   }
 
   close( pDev -> nDevFd );
@@ -103,6 +103,8 @@ void ResetSerialDevice( struct stSerialDevice *pDev )  {
   pDev -> nDevFd = -1;
   pDev -> nThreadId = 0;
   pDev -> pReceiveSerialFn = NULL;
+  pDev -> pReadIOFn  = NULL;
+  pDev -> pWriteIOFn = NULL;
   memset( pDev -> szDeviceFileName, 0, PATH_MAX );
 
   ResetSerialOptions( pDev );
@@ -120,15 +122,20 @@ int OpenSerial( struct stSerialDevice *pDev )  {
   pDev -> nDevFd  = open( pDev -> szDeviceFileName, O_RDWR | O_NOCTTY );
 
   if( pDev -> nDevFd  > 0 )  {
+
+    int nRetCode = 0;
+
     /*
-     * Start the serial input thread.
+     * If there's a receive callback assigned to respond receive events, the
+     * receiver thread will be started.
      */
-    if( pthread_create( &pDev -> nThreadId,
-                        NULL,
-                        __SerialThreadLoop,
-                        ( void * ) pDev ) )  {
+    if( pDev -> pReceiveSerialFn )
+      nRetCode = pthread_create( &pDev -> nThreadId,
+                                 NULL,
+                                 __SerialThreadLoop,
+                                 ( void * ) pDev );
+    if( nRetCode )
       close( pDev -> nDevFd );
-    }
     else  {
       ApplySerialOptions( pDev );
       pDev -> nIsOpen = 1;

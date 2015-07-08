@@ -130,9 +130,13 @@
 #define    STOP_BITS_2             1
 
 /**
-  * Serial events callback definition
+  * Module Callback definitions
   */
-typedef void ( *SERIAL_IO_FN ) ( int );
+// Event handling callback
+typedef void ( *SERIAL_EVT_FN ) ( void *pDev );
+
+// I/O handling callback
+typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
 
 
 /**
@@ -158,7 +162,9 @@ struct stSerialDevice  {
   char                        szDeviceFileName[PATH_MAX];
   pthread_t                   nThreadId;
   struct stSerialOptions      serialOptions;
-  SERIAL_IO_FN                pReceiveSerialFn;
+  IO_FN                       pReadIOFn;
+  IO_FN                       pWriteIOFn;
+  SERIAL_EVT_FN               pReceiveSerialFn;
 };
 
 
