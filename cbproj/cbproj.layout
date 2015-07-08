@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../src/c/comm/serial.c" open="1" top="1" tabpos="2">
+		<Cursor position="4389" topLine="213" />
+	</File>
+	<File name="../src/c/comm/serial.h" open="1" top="0" tabpos="1">
+		<Cursor position="4207" topLine="119" />
+	</File>
+</CodeBlocks_layout_file>
