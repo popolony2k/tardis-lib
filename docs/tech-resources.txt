@@ -1,0 +1,7 @@
+#
+# Technical resouces available on the internet.
+#
+
+# Serial communication links
+
+https://www.cmrr.umn.edu/~strupp/serial.html
