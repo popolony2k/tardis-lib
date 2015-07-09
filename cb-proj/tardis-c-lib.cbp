@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/cbproj" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/tardis" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -19,7 +19,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/cbproj" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/tardis" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -37,10 +37,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../src/c/comm/serial.c">
+		<Unit filename="../src/c/comm/include/serial.h" />
+		<Unit filename="../src/c/comm/source/serial.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../src/c/comm/serial.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
