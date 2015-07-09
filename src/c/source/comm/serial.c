@@ -39,7 +39,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include "serial.h"
+#include "comm/serial.h"
 
 
 
