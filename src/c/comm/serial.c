@@ -99,7 +99,7 @@ void __WaitForSerialThreadStop( struct stSerialDevice *pDev )  {
 void ResetSerialDevice( struct stSerialDevice *pDev )  {
 
   pDev -> nIsOpen = 0;
-  pDev -> nReadTimeout = 30000;
+  pDev -> nReadTimeout = 10000;
   pDev -> nDevFd = -1;
   pDev -> nThreadId = 0;
   pDev -> pReceiveSerialFn = NULL;
