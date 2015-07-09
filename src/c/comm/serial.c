@@ -89,28 +89,6 @@ void __WaitForSerialThreadStop( struct stSerialDevice *pDev )  {
 }
 
 /**
-  * Reset the serail communication structure passed by parameter, applying its
-  * default values.
-  * @param pDev Pointer to a @see stSerialDevice which will be
-  * initialized;
-  * WARNING: DON'T USE this function for valid and working devices pointed
-  * by a @see stSerialDevice struct;
-  */
-void ResetSerialDevice( struct stSerialDevice *pDev )  {
-
-  pDev -> nIsOpen = 0;
-  pDev -> nReadTimeout = 10000;
-  pDev -> nDevFd = -1;
-  pDev -> nThreadId = 0;
-  pDev -> pReceiveSerialFn = NULL;
-  pDev -> pReadIOFn  = NULL;
-  pDev -> pWriteIOFn = NULL;
-  memset( pDev -> szDeviceFileName, 0, PATH_MAX );
-
-  ResetSerialOptions( pDev );
-}
-
-/**
   * Open a serial device.
   * @param pDev Pointer to a @see stSerialDevice which communication will be
   * stablished;
@@ -172,6 +150,28 @@ int CloseSerial( struct stSerialDevice *pDev )  {
 int IsSerialOpen( struct stSerialDevice *pDev ) {
 
   return pDev -> nIsOpen;
+}
+
+/**
+  * Reset the serail communication structure passed by parameter, applying its
+  * default values.
+  * @param pDev Pointer to a @see stSerialDevice which will be
+  * initialized;
+  * WARNING: DON'T USE this function for valid and working devices pointed
+  * by a @see stSerialDevice struct;
+  */
+void ResetSerialDevice( struct stSerialDevice *pDev )  {
+
+  pDev -> nIsOpen = 0;
+  pDev -> nReadTimeout = 10000;
+  pDev -> nDevFd = -1;
+  pDev -> nThreadId = 0;
+  pDev -> pReceiveSerialFn = NULL;
+  pDev -> pReadIOFn  = NULL;
+  pDev -> pWriteIOFn = NULL;
+  memset( pDev -> szDeviceFileName, 0, PATH_MAX );
+
+  ResetSerialOptions( pDev );
 }
 
 /**

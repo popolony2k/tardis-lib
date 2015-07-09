@@ -172,11 +172,11 @@ struct stSerialDevice  {
  * Serial communication functions.
  */
 
-void ResetSerial( struct stSerialDevice *pDev );
-
 int OpenSerial( struct stSerialDevice *pDev );
 int CloseSerial( struct stSerialDevice *pDev );
 int IsSerialOpen( struct stSerialDevice *pDev );
+
+void ResetSerial( struct stSerialDevice *pDev );
 
 void ApplySerialOptions( struct stSerialDevice *pDev );
 void ResetSerialOptions( struct stSerialDevice *pDev );
