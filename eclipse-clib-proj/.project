@@ -25,9 +25,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>comm</name>
+			<name>include</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/c/comm</locationURI>
+			<locationURI>$%7BWORKSPACE_LOC%7D/src/c/include</locationURI>
+		</link>
+		<link>
+			<name>source</name>
+			<type>2</type>
+			<locationURI>$%7BWORKSPACE_LOC%7D/src/c/source</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
