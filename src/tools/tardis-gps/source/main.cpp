@@ -37,6 +37,9 @@
 #include "main.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+#include <unistd.h>
 
 
 /**
@@ -45,6 +48,13 @@
  */
 void OnSerialRead( void *pDev )  {
 
+  struct stSerialDevice  *pSerialDev = ( struct stSerialDevice * ) pDev;
+  char pData[1024];
+
+  memset( pData, 0, 1024 );
+  int nRead = read( pSerialDev -> nDevFd, pData, 1023 );
+
+  printf( "OnSerialRead() - Event received %d - [%s]\n", nRead, pData );
 }
 
 /**
@@ -69,6 +79,8 @@ int main( int argc, char *argv[] )  {
 
   if( OpenSerial( &serialDev ) )  {
     WaitForEvents( &serialDev );
+
+    CloseSerial( &serialDev );
   }
 
   return EXIT_SUCCESS;

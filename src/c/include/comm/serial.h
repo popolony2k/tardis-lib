@@ -133,10 +133,10 @@
 /**
   * Module Callback definitions
   */
-// Event handling callback
+/* Event handling callback */
 typedef void ( *SERIAL_EVT_FN ) ( void *pDev );
 
-// I/O handling callback
+/* I/O handling callback */
 typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
 
 
@@ -144,13 +144,13 @@ typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
   * Serial options structure.
   */
 struct stSerialOptions  {
-  int                         nSpeed;             // Baud rate
-  int                         nCharSize;          // Char size
-  int                         nParity;            // Parity
-  int                         nStopBits;          // Stop bits
-  int                         nEcho;              // Echo ON/OFF
-  int                         nHardwareFlowCtrl;  // Hardware Flow control
-  int                         nSoftwareFlowCtrl;  // Software Flow control
+  int                         nSpeed;             /* Baud rate             */
+  int                         nCharSize;          /* Char size             */
+  int                         nParity;            /* Parity                */
+  int                         nStopBits;          /* Stop bits             */
+  int                         nEcho;              /* Echo ON/OFF           */
+  int                         nHardwareFlowCtrl;  /* Hardware Flow control */
+  int                         nSoftwareFlowCtrl;  /* Software Flow control */
 };
 
 /**
@@ -191,4 +191,4 @@ extern "C" {
 }
 #endif
 
-#endif  // __SERIAL_H__
+#endif  /* __SERIAL_H__ */
