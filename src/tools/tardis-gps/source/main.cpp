@@ -34,5 +34,43 @@
  *
  */
 
-#include "comm/include/serial.h"
+#include "main.h"
+#include <stdlib.h>
+#include <string.h>
+
+
+/**
+ * Event handler for serial OnReceive callback.
+ * @param pDev Pointer to a stSerialDevice data structure;
+ */
+void OnSerialRead( void *pDev )  {
+
+}
+
+/**
+ * Initialize the serial device passed by parameter.
+ * @param pDev Pointer to the device which will be initialized;
+ */
+void InitSerialDevice( struct stSerialDevice *pDev )  {
+
+  pDev -> pReceiveSerialFn = OnSerialRead;
+  strcpy( pDev -> szDeviceFileName, "/dev/rfcomm4" );
+}
+
+
+/**
+ * TARDIS-GPS main entry point.
+ */
+int main( int argc, char *argv[] )  {
+
+  struct stSerialDevice     serialDev;
+
+  InitSerialDevice( &serialDev );
+
+  if( OpenSerial( &serialDev ) )  {
+    WaitForEvents( &serialDev );
+  }
+
+  return EXIT_SUCCESS;
+}
 

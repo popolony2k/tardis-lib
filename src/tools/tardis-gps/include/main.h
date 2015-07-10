@@ -34,11 +34,14 @@
  *
  */
 
-#ifndef __MAIN_H_
-#define __MAIN_H_
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
 #include "comm/serial.h"
 
 
+void OnSerialRead( void *pDev );
+void InitSerialDevice( struct stSerialDevice *pDev );
 
-#endif /* __MAIN_H_ */
+
+#endif /* __MAIN_H__ */

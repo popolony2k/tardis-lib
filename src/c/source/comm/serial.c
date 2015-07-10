@@ -78,16 +78,6 @@ void* __SerialThreadLoop( void *pArg )  {
 }
 
 /**
-  * Wait for the serial thread to stop.
-  * @param pDev Pointer to a previously opened @see stSerialDevice struct;
-  */
-void __WaitForSerialThreadStop( struct stSerialDevice *pDev )  {
-
-  if( pDev -> nThreadId != 0 )
-    pthread_join( pDev -> nThreadId, NULL );
-}
-
-/**
   * Open a serial device.
   * @param pDev Pointer to a @see stSerialDevice which communication will be
   * stablished;
@@ -135,7 +125,7 @@ int CloseSerial( struct stSerialDevice *pDev )  {
   if( pDev -> nDevFd > 0 )  {
     nRetCode = 1;
     pDev -> nIsOpen = 0;   // Notify the thread to exit
-    __WaitForSerialThreadStop( pDev );
+    WaitForEvents( pDev );
   }
 
   return nRetCode;
@@ -149,6 +139,16 @@ int CloseSerial( struct stSerialDevice *pDev )  {
 int IsSerialOpen( struct stSerialDevice *pDev ) {
 
   return pDev -> nIsOpen;
+}
+
+/**
+  * Wait for the serial processing thread to finish.
+  * @param pDev Pointer to a previously opened @see stSerialDevice struct;
+  */
+void WaitForEvents( struct stSerialDevice *pDev )  {
+
+  if( pDev -> nThreadId != 0 )
+    pthread_join( pDev -> nThreadId, NULL );
 }
 
 /**
@@ -252,7 +252,7 @@ void ApplySerialOptions( struct stSerialDevice *pDev )  {
   tcsetattr( pDev -> nDevFd , TCSANOW, &options );
   tcflush( pDev -> nDevFd , TCIFLUSH );
 
-  // Charactere echo
+  // Character echo
   options.c_lflag = pDev -> serialOptions.nEcho;
 
   tcsetattr( pDev -> nDevFd, TCSANOW, &options );

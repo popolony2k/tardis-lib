@@ -173,13 +173,22 @@ struct stSerialDevice  {
  * Serial communication functions.
  */
 
-int OpenSerial( struct stSerialDevice *pDev );
-int CloseSerial( struct stSerialDevice *pDev );
-int IsSerialOpen( struct stSerialDevice *pDev );
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void ResetSerial( struct stSerialDevice *pDev );
+  int OpenSerial( struct stSerialDevice *pDev );
+  int CloseSerial( struct stSerialDevice *pDev );
+  int IsSerialOpen( struct stSerialDevice *pDev );
 
-void ApplySerialOptions( struct stSerialDevice *pDev );
-void ResetSerialOptions( struct stSerialDevice *pDev );
+  void WaitForEvents( struct stSerialDevice *pDev );
+  void ResetSerial( struct stSerialDevice *pDev );
+
+  void ApplySerialOptions( struct stSerialDevice *pDev );
+  void ResetSerialOptions( struct stSerialDevice *pDev );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __SERIAL_H__
