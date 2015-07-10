@@ -37,7 +37,7 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#include "comm/serial.h"
+#include <comm/tserial.h>
 
 
 void OnSerialRead( void *pDev );

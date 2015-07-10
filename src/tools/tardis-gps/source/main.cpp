@@ -52,7 +52,7 @@ void OnSerialRead( void *pDev )  {
   char pData[1024];
 
   memset( pData, 0, 1024 );
-  int nRead = read( pSerialDev -> nDevFd, pData, 1023 );
+  int nRead = read( pSerialDev -> device.nDevFd, pData, 1023 );
 
   printf( "OnSerialRead() - Event received %d - [%s]\n", nRead, pData );
 }
@@ -64,7 +64,7 @@ void OnSerialRead( void *pDev )  {
 void InitSerialDevice( struct stSerialDevice *pDev )  {
 
   pDev -> pReceiveSerialFn = OnSerialRead;
-  strcpy( pDev -> szDeviceFileName, "/dev/rfcomm4" );
+  strcpy( pDev -> device.szDeviceFileName, "/dev/rfcomm4" );
 }
 
 

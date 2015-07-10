@@ -39,8 +39,7 @@
 #define __TSERIAL_H__
 
 #include <pthread.h>
-#include <limits.h>
-#include <sys/types.h>
+#include "ttypes.h"
 
 
 /**
@@ -136,10 +135,6 @@
 /* Event handling callback */
 typedef void ( *SERIAL_EVT_FN ) ( void *pDev );
 
-/* I/O handling callback */
-typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
-
-
 /**
   * Serial options structure.
   */
@@ -157,14 +152,15 @@ struct stSerialOptions  {
   * Serial device handler structure.
   */
 struct stSerialDevice  {
-  int                         nReadTimeout;
-  int                         nDevFd;
-  int                         nIsOpen;
-  char                        szDeviceFileName[PATH_MAX];
+  struct stDevice             device;
+  //int                         nReadTimeout;
+  //int                         nDevFd;
+  //int                         nIsOpen;
+  //char                        szDeviceFileName[PATH_MAX];
   pthread_t                   nThreadId;
   struct stSerialOptions      serialOptions;
-  IO_FN                       pReadIOFn;
-  IO_FN                       pWriteIOFn;
+  //IO_FN                       pReadIOFn;
+  //IO_FN                       pWriteIOFn;
   SERIAL_EVT_FN               pReceiveSerialFn;
 };
 

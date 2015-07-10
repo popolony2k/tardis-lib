@@ -61,18 +61,18 @@ void* __SerialThreadLoop( void *pArg )  {
 
 
   memset( &pfd, 0, sizeof( struct pollfd ) );
-  pfd.fd = pDev -> nDevFd;
+  pfd.fd = pDev -> device.nDevFd;
   pfd.events = POLLIN;
 
-  while( pDev -> nIsOpen )  {
+  while( pDev -> device.nIsOpen )  {
     pfd.revents = 0;
 
     if( ( poll( &pfd, 1, __POLL_TIMEOUT ) > 0 ) && ( pfd.revents == POLLIN ) )
       pDev -> pReceiveSerialFn( pDev );
   }
 
-  close( pDev -> nDevFd );
-  pDev -> nDevFd = -1;
+  close( pDev -> device.nDevFd );
+  pDev -> device.nDevFd = -1;
   pDev -> nThreadId = 0;
 
   return NULL;
@@ -86,10 +86,11 @@ void* __SerialThreadLoop( void *pArg )  {
   */
 int OpenSerial( struct stSerialDevice *pDev )  {
 
-  pDev -> nIsOpen = 0;
-  pDev -> nDevFd  = open( pDev -> szDeviceFileName, O_RDWR | O_NOCTTY );
+  pDev -> device.nIsOpen = 0;
+  pDev -> device.nDevFd  = open( pDev -> device.szDeviceFileName,
+                                 O_RDWR | O_NOCTTY );
 
-  if( pDev -> nDevFd  > 0 )  {
+  if( pDev -> device.nDevFd  > 0 )  {
 
     int nRetCode = 0;
 
@@ -98,7 +99,7 @@ int OpenSerial( struct stSerialDevice *pDev )  {
      * receiver thread will be started.
      */
     if( pDev -> pReceiveSerialFn )  {
-      pDev -> nIsOpen = 1;
+      pDev -> device.nIsOpen = 1;
       nRetCode = pthread_create( &pDev -> nThreadId,
                                  NULL,
                                  __SerialThreadLoop,
@@ -106,14 +107,14 @@ int OpenSerial( struct stSerialDevice *pDev )  {
     }
 
     if( nRetCode )  {
-      pDev -> nIsOpen = 0;
-      close( pDev -> nDevFd );
+      pDev -> device.nIsOpen = 0;
+      close( pDev -> device.nDevFd );
     }
     else
       ApplySerialOptions( pDev );
   }
 
-  return pDev -> nIsOpen;
+  return pDev -> device.nIsOpen;
 }
 
 /**
@@ -126,9 +127,9 @@ int CloseSerial( struct stSerialDevice *pDev )  {
 
   int    nRetCode = 0;
 
-  if( pDev -> nDevFd > 0 )  {
+  if( pDev -> device.nDevFd > 0 )  {
     nRetCode = 1;
-    pDev -> nIsOpen = 0;   /* Notify the thread to exit */
+    pDev -> device.nIsOpen = 0;   /* Notify the thread to exit */
     WaitForEvents( pDev );
   }
 
@@ -142,7 +143,7 @@ int CloseSerial( struct stSerialDevice *pDev )  {
   */
 int IsSerialOpen( struct stSerialDevice *pDev ) {
 
-  return pDev -> nIsOpen;
+  return pDev -> device.nIsOpen;
 }
 
 /**
@@ -165,14 +166,14 @@ void WaitForEvents( struct stSerialDevice *pDev )  {
   */
 void ResetSerialDevice( struct stSerialDevice *pDev )  {
 
-  pDev -> nIsOpen = 0;
-  pDev -> nReadTimeout = 10000;
-  pDev -> nDevFd = -1;
   pDev -> nThreadId = 0;
   pDev -> pReceiveSerialFn = NULL;
-  pDev -> pReadIOFn  = NULL;
-  pDev -> pWriteIOFn = NULL;
-  memset( pDev -> szDeviceFileName, 0, PATH_MAX );
+  pDev -> device.nIsOpen = 0;
+  pDev -> device.nReadTimeout = 10000;
+  pDev -> device.nDevFd = -1;
+  pDev -> device.pReadIOFn  = NULL;
+  pDev -> device.pWriteIOFn = NULL;
+  memset( pDev -> device.szDeviceFileName, 0, PATH_MAX );
 
   ResetSerialOptions( pDev );
 }
@@ -187,20 +188,20 @@ void ApplySerialOptions( struct stSerialDevice *pDev )  {
   struct termios  options;
 
 
-  tcgetattr( pDev -> nDevFd, &options );
+  tcgetattr( pDev -> device.nDevFd, &options );
 
   /* Baud rate */
   cfsetispeed( &options, pDev -> serialOptions.nSpeed );
   cfsetospeed( &options, pDev -> serialOptions.nSpeed );
   options.c_cflag |= ( CLOCAL | CREAD );
-  tcsetattr( pDev -> nDevFd , TCSANOW, &options );
-  tcflush( pDev -> nDevFd , TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd , TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd , TCIFLUSH );
 
   /* Char size */
   options.c_cflag &= ~CSIZE;
   options.c_cflag |= pDev -> serialOptions.nCharSize;
-  tcsetattr( pDev -> nDevFd , TCSANOW, &options );
-  tcflush( pDev -> nDevFd, TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd , TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd, TCIFLUSH );
 
   /* Stop bits */
   if( pDev -> serialOptions.nStopBits == STOP_BITS_2 )
@@ -235,8 +236,8 @@ void ApplySerialOptions( struct stSerialDevice *pDev )  {
     }  break;
   }
 
-  tcsetattr( pDev -> nDevFd , TCSANOW, &options );
-  tcflush( pDev -> nDevFd , TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd , TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd , TCIFLUSH );
 
   /* Hardware flow control */
   if( pDev -> serialOptions.nHardwareFlowCtrl == ON )
@@ -244,8 +245,8 @@ void ApplySerialOptions( struct stSerialDevice *pDev )  {
   else
     options.c_cflag &= ~CRTSCTS;
 
-  tcsetattr( pDev -> nDevFd , TCSANOW, &options );
-  tcflush( pDev -> nDevFd , TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd , TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd , TCIFLUSH );
 
   /* Software flow control */
   if( pDev -> serialOptions.nSoftwareFlowCtrl == ON )
@@ -253,14 +254,14 @@ void ApplySerialOptions( struct stSerialDevice *pDev )  {
   else
     options.c_iflag &= ~( IXON | IXOFF | IXANY );
 
-  tcsetattr( pDev -> nDevFd , TCSANOW, &options );
-  tcflush( pDev -> nDevFd , TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd , TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd , TCIFLUSH );
 
   /* Character echo */
   options.c_lflag = pDev -> serialOptions.nEcho;
 
-  tcsetattr( pDev -> nDevFd, TCSANOW, &options );
-  tcflush( pDev -> nDevFd, TCIFLUSH );
+  tcsetattr( pDev -> device.nDevFd, TCSANOW, &options );
+  tcflush( pDev -> device.nDevFd, TCIFLUSH );
 }
 
 /**

@@ -37,8 +37,12 @@
 #ifndef __TBASEIO_H__
 #define __TBASEIO_H__
 
+#include <limits.h>
+#include "ttypes.h"
 
 
+int ReadIO( struct stDevice *pDev, void *pBuffer, int nDataLen );
+int WriteIO( struct stDevice *pDev, void *pBuffer, int nDataLen );
 
 
 #endif /* __TBASEIO_H__ */
