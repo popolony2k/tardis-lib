@@ -38,8 +38,8 @@
 #ifndef __TSERIAL_H__
 #define __TSERIAL_H__
 
+#include <comm/tcommtypes.h>
 #include <pthread.h>
-#include "ttypes.h"
 
 
 /**
@@ -98,7 +98,7 @@
 #define    BRATE_19200             B19200
 #define    BRATE_38400             B38400
 #define    BRATE_57600             B57600
-//#define    BRATE_76800             B76800
+#define    BRATE_76800             B76800
 #define    BRATE_115200            B115200
 
 /**
@@ -153,14 +153,8 @@ struct stSerialOptions  {
   */
 struct stSerialDevice  {
   struct stDevice             device;
-  //int                         nReadTimeout;
-  //int                         nDevFd;
-  //int                         nIsOpen;
-  //char                        szDeviceFileName[PATH_MAX];
   pthread_t                   nThreadId;
   struct stSerialOptions      serialOptions;
-  //IO_FN                       pReadIOFn;
-  //IO_FN                       pWriteIOFn;
   SERIAL_EVT_FN               pReceiveSerialFn;
 };
 

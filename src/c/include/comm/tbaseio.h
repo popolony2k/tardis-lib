@@ -37,8 +37,8 @@
 #ifndef __TBASEIO_H__
 #define __TBASEIO_H__
 
+#include <comm/tcommtypes.h>
 #include <limits.h>
-#include "ttypes.h"
 
 
 int ReadIO( struct stDevice *pDev, void *pBuffer, int nDataLen );
