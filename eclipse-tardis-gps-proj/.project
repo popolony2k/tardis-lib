@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>tardis-gps-proj</name>
+	<name>eclipse-tardis-gps-proj</name>
 	<comment></comment>
 	<projects>
 		<project>eclipse-clib-proj</project>
