@@ -34,7 +34,8 @@
  *
  */
 
-#include <comm/tserial.h>
+#include "comm/tserial.h"
+#include "comm/tbaseio.h"
 #include <sys/stat.h>
 #include <termios.h>
 #include <fcntl.h>
@@ -147,6 +148,28 @@ int IsSerialOpen( struct stSerialDevice *pDev ) {
 }
 
 /**
+ * Read data from serial device.
+ * @param pDev Pointer to an opened serial device handler;
+ * @param pBuffer Pointer to a buffer to receive the data read;
+ * @param nBufferSize The Buffer size to read;
+ */
+int ReadSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize ) {
+
+  return ReadIO( &pDev -> device, pBuffer, nBufferSize );
+}
+
+/**
+ * Write data to a serial device.
+ * @param pDev Pointer to an opened serial device handler;
+ * @param pBuffer Pointer to a buffer containing the data to send;
+ * @param nBufferSize The Buffer size;
+ */
+int WriteSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize ) {
+
+  return WriteIO( &pDev -> device, pBuffer, nBufferSize );
+}
+
+/**
   * Wait for the serial processing thread to finish.
   * @param pDev Pointer to a previously opened @see stSerialDevice struct;
   */
@@ -169,8 +192,9 @@ void ResetSerialDevice( struct stSerialDevice *pDev )  {
   pDev -> nThreadId = 0;
   pDev -> pReceiveSerialFn = NULL;
   pDev -> device.nIsOpen = 0;
-  pDev -> device.nReadTimeout = 10000;
-  pDev -> device.nDevFd = -1;
+  pDev -> device.nDevFd  = -1;
+  pDev -> device.nReadTimeout  = 10000;
+  pDev -> device.nWriteTimeout = 10000;
   pDev -> device.pReadIOFn  = NULL;
   pDev -> device.pWriteIOFn = NULL;
   memset( pDev -> device.szDeviceFileName, 0, PATH_MAX );

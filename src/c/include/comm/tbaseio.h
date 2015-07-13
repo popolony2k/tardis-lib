@@ -37,16 +37,19 @@
 #ifndef __TBASEIO_H__
 #define __TBASEIO_H__
 
-#include <comm/tcommtypes.h>
+#include "comm/tcommtypes.h"
 #include <limits.h>
 
-#define    IO_SUCCESS             -1000
-#define    IO_TIMEOUT             -1001
-#define    IO_ERROR               -1002
-#define    INVALID_BUFFER_SIZE    -1003
-#define    INVALID_FD_HANDLE      -1004
-#define    INVALID_DEVICE_HANDLE  -1005
-#define    IO_LAST_ID             -1006
+/**
+ * Return codes for @see ReadIO and @see WriteIO.
+ */
+#define    IO_SUCCESS                -1000
+#define    IO_TIMEOUT                -1001
+#define    IO_ERROR                  -1002
+#define    IO_INVALID_BUFFER_SIZE    -1003
+#define    IO_INVALID_FD_HANDLE      -1004
+#define    IO_INVALID_DEVICE_HANDLE  -1005
+#define    IO_LAST_ID                -1006
 
 
 int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );

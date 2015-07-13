@@ -50,6 +50,7 @@ typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
   */
 struct stDevice  {
   int                         nReadTimeout;
+  int                         nWriteTimeout;
   int                         nDevFd;
   int                         nIsOpen;
   char                        szDeviceFileName[PATH_MAX];

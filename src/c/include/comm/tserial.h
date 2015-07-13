@@ -171,6 +171,9 @@ extern "C" {
   int CloseSerial( struct stSerialDevice *pDev );
   int IsSerialOpen( struct stSerialDevice *pDev );
 
+  int ReadSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize );
+  int WriteSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize );
+
   void WaitForEvents( struct stSerialDevice *pDev );
   void ResetSerial( struct stSerialDevice *pDev );
 
