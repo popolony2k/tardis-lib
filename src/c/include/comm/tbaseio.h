@@ -40,9 +40,17 @@
 #include <comm/tcommtypes.h>
 #include <limits.h>
 
+#define    IO_SUCCESS             -1000
+#define    IO_TIMEOUT             -1001
+#define    IO_ERROR               -1002
+#define    INVALID_BUFFER_SIZE    -1003
+#define    INVALID_FD_HANDLE      -1004
+#define    INVALID_DEVICE_HANDLE  -1005
+#define    IO_LAST_ID             -1006
 
-int ReadIO( struct stDevice *pDev, void *pBuffer, int nDataLen );
-int WriteIO( struct stDevice *pDev, void *pBuffer, int nDataLen );
+
+int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
+int WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
 
 
 #endif /* __TBASEIO_H__ */
