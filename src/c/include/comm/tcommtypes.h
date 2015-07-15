@@ -38,24 +38,27 @@
 #define __TCOMMTYPES_H__
 
 #include <limits.h>
+#include <pthread.h>
 #include <sys/types.h>
 
 
-/* I/O handling callback */
-typedef ssize_t ( *IO_FN ) ( void *pParm, void *pData, size_t nSize );
-
+/**
+  * Module Callback definitions
+  */
+/* Event handling callback */
+typedef void ( *IO_EVENT_FN ) ( void *pDev );
 
 /**
   * General device handler structure.
   */
 struct stDevice  {
+  pthread_t                   nThreadId;
   int                         nReadTimeout;
   int                         nWriteTimeout;
   int                         nDevFd;
-  int                         nIsOpen;
+  int                         nIsEvtRunning;
   char                        szDeviceFileName[PATH_MAX];
-  IO_FN                       pReadIOFn;
-  IO_FN                       pWriteIOFn;
+  IO_EVENT_FN                 pOnReceiveFn;
 };
 
 #endif /* __TCOMMTYPES_H__ */

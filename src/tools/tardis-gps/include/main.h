@@ -37,8 +37,8 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#include <comm/tserial.h>
-
+#include "comm/tbaseio.h"
+#include "comm/tserial.h"
 
 void OnSerialRead( void *pDev );
 void InitSerialDevice( struct stSerialDevice *pDev );

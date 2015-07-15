@@ -36,14 +36,100 @@
 
 #include "comm/tbaseio.h"
 #include <string.h>
+#include <poll.h>
 #include <unistd.h>
 
 /*
- * Internal definitions
+ * Internal module definitions
  */
-#define __WRITE_PACKET_SIZE     16   /* Write packet size */
+#define __WRITE_PACKET_SIZE     128   /* Write packet size */
+#define __POLL_TIMEOUT          1000  /* Timeout for event polling */
+#define __DEFAULT_IO_TIMEOUT    10000 /* Default I/O timeout */
 
 
+/**
+  * Implement the thread which will manage the event handling
+  * for data receiving from device.
+  * @param pArg Pointer to a @see stDevice to observe;
+  */
+void* __EvtHandler( void *pArg )  {
+
+  struct stDevice  *pDev = ( struct stDevice * ) pArg;
+  struct pollfd    pfd;
+
+
+  memset( &pfd, 0, sizeof( struct pollfd ) );
+  pfd.fd = pDev -> nDevFd;
+  pfd.events = POLLIN;
+
+  while( pDev -> nIsEvtRunning )  {
+    pfd.revents = 0;
+
+    if( ( poll( &pfd, 1, __POLL_TIMEOUT ) > 0 ) && ( pfd.revents == POLLIN ) )
+      pDev -> pOnReceiveFn( pDev );
+  }
+
+  close( pDev -> nDevFd );
+  pDev -> nDevFd    = -1;
+  pDev -> nThreadId = 0;
+  pDev -> nIsEvtRunning = 0;
+
+  return NULL;
+}
+
+/**
+ * Reset the @see stDevice passed as parameter;
+ * @param pDev Pointer to the @see stDevice which will be reseted;
+ * WARNING: DON'T USE this function for valid and working @see stDevices;
+ */
+void ResetIODevice( struct stDevice *pDev )  {
+
+  pDev -> nDevFd    = -1;
+  pDev -> nThreadId = 0;
+  pDev -> nIsEvtRunning = 0;
+  pDev -> pOnReceiveFn  = NULL;
+  pDev -> nReadTimeout  = __DEFAULT_IO_TIMEOUT;
+  pDev -> nWriteTimeout = __DEFAULT_IO_TIMEOUT;
+}
+
+/**
+ * Start the IO event receiver thread manager.
+ * @param pDev Pointer to @see stDevice which event will be listen;
+ */
+int StartIOEventsReceiver( struct stDevice *pDev )  {
+
+  /*
+   * If there's a receive callback assigned to respond receive events, the
+   * receiver thread will be started.
+   */
+  if( pDev -> pOnReceiveFn )  {
+    pDev -> nIsEvtRunning = 1;
+
+    if( pthread_create( &pDev -> nThreadId, NULL, __EvtHandler,( void * ) pDev ) )
+      pDev -> nIsEvtRunning = 0;
+  }
+
+  return pDev -> nIsEvtRunning;
+}
+
+/**
+ * Stop an open IO event receiver thread manager.
+ * @param pDev Pointer to @see stDevice which event will be stopped;
+ */
+void StopIOEventsReceiver( struct stDevice *pDev )  {
+
+  pDev -> nIsEvtRunning = 0;
+}
+
+/**
+ * Wait for I/O events from the @see stDevice passed as parameter.
+ * @param pDev The @see stDevice whose events will be listened;
+ */
+void WaitIOEvents( struct stDevice *pDev )  {
+
+  if( pDev -> nThreadId != 0 )
+    pthread_join( pDev -> nThreadId, NULL );
+}
 
 /**
  * Read data from specified device passed by parameter.
@@ -53,10 +139,9 @@
  * @param pBuffer Pointer to a buffer to receive the data read;
  * @param nBufferSize The Buffer size to read;
  */
-int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
+ssize_t ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
 
   if( pDev )  {
-
     if( nBufferSize <= 0 )
       return IO_INVALID_BUFFER_SIZE;
     else  {
@@ -65,10 +150,10 @@ int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
       else  {
         struct timeval      readTimeout;
         fd_set              readfs;
-        int                 nRead;
-        int                 nCount = 0;
-        int                 nMaxFd = pDev -> nDevFd + 1;
         int                 nRet;
+        int                 nRead;
+        int                 nMaxFd = pDev -> nDevFd + 1;
+        ssize_t             nCount = 0;
 
         memset( &readTimeout, 0, sizeof( readTimeout ) );
         readTimeout.tv_usec = pDev -> nReadTimeout * 1000;
@@ -115,16 +200,16 @@ int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
  * @param pBuffer Pointer to a buffer containing the data to be written;
  * @param nBufferSize The Buffer size to write;
  */
-int WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
+ssize_t WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
   if( pDev )  {
     if( pDev -> nDevFd <= 0 )
       return IO_INVALID_FD_HANDLE;
     else  {
       int                 nWrite;
-      int                 nCount         = 0;
-      int                 nRet           = 0;
-      int                 nPacketSize    = __WRITE_PACKET_SIZE;
-      int                 nMaxFd         = pDev -> nDevFd  + 1;
+      int                 nRet         = 0;
+      int                 nPacketSize  = __WRITE_PACKET_SIZE;
+      int                 nMaxFd       = pDev -> nDevFd  + 1;
+      ssize_t             nCount       = 0;
       struct timeval      writeTimeout;
       fd_set              writefs;
 

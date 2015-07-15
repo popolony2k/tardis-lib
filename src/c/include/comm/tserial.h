@@ -38,8 +38,7 @@
 #ifndef __TSERIAL_H__
 #define __TSERIAL_H__
 
-#include <comm/tcommtypes.h>
-#include <pthread.h>
+#include "comm/tcommtypes.h"
 
 
 /**
@@ -137,12 +136,6 @@
 
 
 /**
-  * Module Callback definitions
-  */
-/* Event handling callback */
-typedef void ( *SERIAL_EVT_FN ) ( void *pDev );
-
-/**
   * Serial options structure.
   */
 struct stSerialOptions  {
@@ -160,9 +153,7 @@ struct stSerialOptions  {
   */
 struct stSerialDevice  {
   struct stDevice             device;
-  pthread_t                   nThreadId;
   struct stSerialOptions      serialOptions;
-  SERIAL_EVT_FN               pReceiveSerialFn;
 };
 
 
@@ -176,18 +167,16 @@ extern "C" {
 
   int OpenSerial( struct stSerialDevice *pDev );
   int CloseSerial( struct stSerialDevice *pDev );
-  int IsSerialOpen( struct stSerialDevice *pDev );
 
-  int ReadSerial( int nMode,
-                  struct stSerialDevice *pDev,
-                  void *pBuffer,
-                  int nBufferSize );
-  int WriteSerial( int nMode,
-                   struct stSerialDevice *pDev,
-                   void *pBuffer,
-                   int nBufferSize );
+  ssize_t ReadSerial( int nMode,
+                      struct stSerialDevice *pDev,
+                      void *pBuffer,
+                      int nBufferSize );
+  ssize_t WriteSerial( int nMode,
+                       struct stSerialDevice *pDev,
+                       void *pBuffer,
+                       int nBufferSize );
 
-  void WaitForEvents( struct stSerialDevice *pDev );
   void ResetSerial( struct stSerialDevice *pDev );
 
   void ApplySerialOptions( struct stSerialDevice *pDev );

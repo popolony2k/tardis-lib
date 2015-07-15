@@ -38,7 +38,6 @@
 #define __TBASEIO_H__
 
 #include "comm/tcommtypes.h"
-#include <limits.h>
 
 /**
  * Return codes for @see ReadIO and @see WriteIO.
@@ -52,8 +51,21 @@
 #define    IO_LAST_ID                -1006
 
 
-int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
-int WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+  void ResetIODevice( struct stDevice *pDev );
+
+  int StartIOEventsReceiver( struct stDevice *pDev );
+  void StopIOEventsReceiver( struct stDevice *pDev );
+  void WaitIOEvents( struct stDevice *pDev );
+
+  ssize_t ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
+  ssize_t WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TBASEIO_H__ */

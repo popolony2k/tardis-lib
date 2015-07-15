@@ -40,45 +40,9 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <poll.h>
 #include <string.h>
 
 
-/**
- * Internal module definitions
- */
-#define __POLL_TIMEOUT        1000     /* Timeout for event polling */
-#define __DEFAULT_IO_TIMEOUT  10000    /* Default I/O timeout */
-
-
-
-/**
-  * Implement the thread which will manage the data receiving from device.
-  * @param pArg Pointer to a @see stSerialDevice to observe;
-  */
-void* __SerialThreadLoop( void *pArg )  {
-
-  struct stSerialDevice  *pDev = ( struct stSerialDevice * ) pArg;
-  struct pollfd          pfd;
-
-
-  memset( &pfd, 0, sizeof( struct pollfd ) );
-  pfd.fd = pDev -> device.nDevFd;
-  pfd.events = POLLIN;
-
-  while( pDev -> device.nIsOpen )  {
-    pfd.revents = 0;
-
-    if( ( poll( &pfd, 1, __POLL_TIMEOUT ) > 0 ) && ( pfd.revents == POLLIN ) )
-      pDev -> pReceiveSerialFn( pDev );
-  }
-
-  close( pDev -> device.nDevFd );
-  pDev -> device.nDevFd = -1;
-  pDev -> nThreadId = 0;
-
-  return NULL;
-}
 
 /**
   * Open a serial device.
@@ -88,35 +52,19 @@ void* __SerialThreadLoop( void *pArg )  {
   */
 int OpenSerial( struct stSerialDevice *pDev )  {
 
-  pDev -> device.nIsOpen = 0;
-  pDev -> device.nDevFd  = open( pDev -> device.szDeviceFileName,
-                                 O_RDWR | O_NOCTTY );
+  pDev -> device.nDevFd = open( pDev -> device.szDeviceFileName,
+                                O_RDWR | O_NOCTTY );
 
   if( pDev -> device.nDevFd  > 0 )  {
+    int nRetCode = StartIOEventsReceiver( &pDev -> device );
 
-    int nRetCode = 0;
-
-    /*
-     * If there's a receive callback assigned to respond receive events, the
-     * receiver thread will be started.
-     */
-    if( pDev -> pReceiveSerialFn )  {
-      pDev -> device.nIsOpen = 1;
-      nRetCode = pthread_create( &pDev -> nThreadId,
-                                 NULL,
-                                 __SerialThreadLoop,
-                                 ( void * ) pDev );
-    }
-
-    if( nRetCode )  {
-      pDev -> device.nIsOpen = 0;
+    if( !nRetCode )
       close( pDev -> device.nDevFd );
-    }
     else
       ApplySerialOptions( pDev );
   }
 
-  return pDev -> device.nIsOpen;
+  return pDev -> device.nIsEvtRunning;
 }
 
 /**
@@ -131,21 +79,11 @@ int CloseSerial( struct stSerialDevice *pDev )  {
 
   if( pDev -> device.nDevFd > 0 )  {
     nRetCode = 1;
-    pDev -> device.nIsOpen = 0;   /* Notify the thread to exit */
-    WaitForEvents( pDev );
+    StopIOEventsReceiver( &pDev -> device );
+    WaitIOEvents( &pDev -> device );
   }
 
   return nRetCode;
-}
-
-/**
-  * Chek if the serial communication is still opened;
-  * @param pDev Pointer to a @see stSerialDevice which communication will be
-  * checked;
-  */
-int IsSerialOpen( struct stSerialDevice *pDev ) {
-
-  return pDev -> device.nIsOpen;
 }
 
 /**
@@ -156,10 +94,10 @@ int IsSerialOpen( struct stSerialDevice *pDev ) {
  * @param pBuffer Pointer to a buffer to receive the data read;
  * @param nBufferSize The Buffer size to read;
  */
-int ReadSerial( int nMode,
-                struct stSerialDevice *pDev,
-                void *pBuffer,
-                int nBufferSize ) {
+ssize_t ReadSerial( int nMode,
+                    struct stSerialDevice *pDev,
+                    void *pBuffer,
+                    int nBufferSize ) {
 
   if( nMode == SERIAL_IO_MODE_DIRECT )
     return read( pDev -> device.nDevFd, pBuffer, nBufferSize );
@@ -175,10 +113,10 @@ int ReadSerial( int nMode,
  * @param pBuffer Pointer to a buffer containing the data to send;
  * @param nBufferSize The Buffer size;
  */
-int WriteSerial( int nMode,
-                 struct stSerialDevice *pDev,
-                 void *pBuffer,
-                 int nBufferSize ) {
+ssize_t WriteSerial( int nMode,
+                     struct stSerialDevice *pDev,
+                     void *pBuffer,
+                     int nBufferSize ) {
 
   if( nMode == SERIAL_IO_MODE_DIRECT )
     return write( pDev -> device.nDevFd, pBuffer, nBufferSize );
@@ -187,35 +125,16 @@ int WriteSerial( int nMode,
 }
 
 /**
-  * Wait for the serial processing thread to finish.
-  * @param pDev Pointer to a previously opened @see stSerialDevice struct;
-  */
-void WaitForEvents( struct stSerialDevice *pDev )  {
-
-  if( pDev -> nThreadId != 0 )
-    pthread_join( pDev -> nThreadId, NULL );
-}
-
-/**
   * Reset the serail communication structure passed by parameter, applying its
   * default values.
   * @param pDev Pointer to a @see stSerialDevice which will be
   * initialized;
-  * WARNING: DON'T USE this function for valid and working devices pointed
-  * by a @see stSerialDevice struct;
+  * WARNING: DON'T USE this function for valid and working @see stSerialDevice;
   */
-void ResetSerialDevice( struct stSerialDevice *pDev )  {
+void ResetSerial( struct stSerialDevice *pDev )  {
 
-  pDev -> nThreadId = 0;
-  pDev -> pReceiveSerialFn = NULL;
-  pDev -> device.nIsOpen = 0;
-  pDev -> device.nDevFd  = -1;
-  pDev -> device.nReadTimeout  = __DEFAULT_IO_TIMEOUT;
-  pDev -> device.nWriteTimeout = __DEFAULT_IO_TIMEOUT;
-  pDev -> device.pReadIOFn  = NULL;
-  pDev -> device.pWriteIOFn = NULL;
+  ResetIODevice( &pDev -> device );
   memset( pDev -> device.szDeviceFileName, 0, PATH_MAX );
-
   ResetSerialOptions( pDev );
 }
 

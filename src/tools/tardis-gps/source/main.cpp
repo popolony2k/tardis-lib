@@ -61,7 +61,8 @@ void OnSerialRead( void *pDev )  {
  */
 void InitSerialDevice( struct stSerialDevice *pDev )  {
 
-  pDev -> pReceiveSerialFn = OnSerialRead;
+  ResetSerial( pDev );
+  pDev -> device.pOnReceiveFn = OnSerialRead;
   strcpy( pDev -> device.szDeviceFileName, "/dev/rfcomm4" );
 }
 
@@ -76,7 +77,7 @@ int main( int argc, char *argv[] )  {
   InitSerialDevice( &serialDev );
 
   if( OpenSerial( &serialDev ) )  {
-    WaitForEvents( &serialDev );
+    WaitIOEvents( &serialDev.device );
 
     CloseSerial( &serialDev );
   }
