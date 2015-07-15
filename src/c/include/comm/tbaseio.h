@@ -64,6 +64,11 @@ extern "C" {
   ssize_t ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
   ssize_t WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize );
 
+  ssize_t ReadDelim( struct stDevice *pDev,
+                     void *pBuffer,
+                     int nBufferSize,
+                     const char *szDelim );
+
 #ifdef __cplusplus
 }
 #endif

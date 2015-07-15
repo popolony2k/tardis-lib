@@ -251,3 +251,80 @@ ssize_t WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
 
   return IO_INVALID_DEVICE_HANDLE;
 }
+
+/**
+ * Performs a device reading until the specified delimiter to be reached.
+ * @param pDev Pointer to an opened serial device handler;
+ * @param pBuffer Pointer to a buffer to receive the data read;
+ * @param nBufferSize The size of buffer pointed by *pBuffer;
+ * @param szDelimiter The string containing the delimiter for end of
+ * buffer reading;
+ */
+ssize_t ReadDelim( struct stDevice *pDev,
+                   void *pBuffer,
+                   int nBufferSize,
+                   const char *szDelim )  {
+
+  if( pDev )  {
+    if( nBufferSize <= 0 )
+      return IO_INVALID_BUFFER_SIZE;
+    else  {
+      if( pDev -> nDevFd <= 0 )
+        return IO_INVALID_FD_HANDLE;
+      else  {
+        struct timeval      readTimeout;
+        fd_set              readfs;
+        int                 nEOD        = 0;  /* End of delimiter */
+        int                 nDelimCount = 0;
+        int                 nDelimSize  = strlen( szDelim );
+        int                 nRet;
+        int                 nRead;
+        int                 nMaxFd = pDev -> nDevFd + 1;
+        ssize_t             nCount = 0;
+
+
+        memset( &readTimeout, 0, sizeof( readTimeout ) );
+        readTimeout.tv_usec = pDev -> nReadTimeout * 1000;
+
+        do {
+          FD_ZERO( &readfs );
+          FD_SET( pDev -> nDevFd, &readfs );
+          nRead = 0;
+          nRet  = select( nMaxFd, &readfs, NULL, NULL,
+                          ( pDev -> nReadTimeout > 0 ? &readTimeout : NULL ) );
+
+          if( FD_ISSET( pDev -> nDevFd, &readfs ) && ( nRet != -1 ) )
+            nRead = read( pDev -> nDevFd,
+                          &( ( char * ) pBuffer )[nCount],
+                          1 );
+          else  {
+            /* Timeout has occurred ?? */
+            if( nCount == 0 )
+              return IO_TIMEOUT;
+            else
+              return nCount;
+          }
+
+          if( nRead > 0 )  {
+            /* Check for the delimiter. */
+            if( ( ( char * ) pBuffer )[nCount] == szDelim[nDelimCount] )  {
+              nDelimCount++;
+              nEOD = ( nDelimCount == nDelimSize );
+            }
+            else
+              nDelimCount = 0;
+
+            nCount+=nRead;
+          }
+          else  /* Connection lost ?? */
+            return nCount;
+
+        } while( ( nCount < nBufferSize ) && !nEOD );
+
+        return nCount;
+      }
+    }
+  }
+
+  return IO_INVALID_DEVICE_HANDLE;
+}
