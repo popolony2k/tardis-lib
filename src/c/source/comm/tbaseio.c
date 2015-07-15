@@ -47,6 +47,8 @@
 
 /**
  * Read data from specified device passed by parameter.
+ * This function ensures the data buffer loading, controlling communication
+ * timeout and  data fragmentation loading.
  * @param pDev Pointer to an opened serial device handler;
  * @param pBuffer Pointer to a buffer to receive the data read;
  * @param nBufferSize The Buffer size to read;
@@ -92,11 +94,8 @@ int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
 
           if( nRead > 0 )
             nCount+=nRead;
-          else  {
-            /* Connection lost ?? */
-            //pIO -> bConnectionBroken = TRUE;
+          else  /* Connection lost ?? */
             return nCount;
-          }
 
         } while( nCount < nBufferSize );
 
@@ -110,6 +109,8 @@ int ReadIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
 
 /**
  * Write data to the specified device passed by parameter.
+ * This function ensures the data buffer sending, controlling communication
+ * timeout and data fragmentation sending.
  * @param pDev Pointer to an opened serial device handler;
  * @param pBuffer Pointer to a buffer containing the data to be written;
  * @param nBufferSize The Buffer size to write;
@@ -154,11 +155,8 @@ int WriteIO( struct stDevice *pDev, void *pBuffer, int nBufferSize )  {
               ( ( nBufferSize - nCount ) < __WRITE_PACKET_SIZE ) )
               nPacketSize = ( nBufferSize - nCount );
         }
-        else  {
-          /* Connection lost ?? */
-          //pIO -> bConnectionBroken = TRUE;
+        else  /* Connection lost ?? */
           return IO_ERROR;
-        }
 
       } while( ( nCount < nBufferSize ) && ( nPacketSize > 0 ) );
 

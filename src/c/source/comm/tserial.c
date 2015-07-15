@@ -47,7 +47,8 @@
 /**
  * Internal module definitions
  */
-#define __POLL_TIMEOUT     1000  /* Timeout for event polling */
+#define __POLL_TIMEOUT        1000     /* Timeout for event polling */
+#define __DEFAULT_IO_TIMEOUT  10000    /* Default I/O timeout */
 
 
 
@@ -149,24 +150,40 @@ int IsSerialOpen( struct stSerialDevice *pDev ) {
 
 /**
  * Read data from serial device.
+ * @param nMode The function operation mode (SERIAL_IO_MODE_DIRECT or
+ * SERIAL_IO_MODE_BUFFERED);
  * @param pDev Pointer to an opened serial device handler;
  * @param pBuffer Pointer to a buffer to receive the data read;
  * @param nBufferSize The Buffer size to read;
  */
-int ReadSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize ) {
+int ReadSerial( int nMode,
+                struct stSerialDevice *pDev,
+                void *pBuffer,
+                int nBufferSize ) {
 
-  return ReadIO( &pDev -> device, pBuffer, nBufferSize );
+  if( nMode == SERIAL_IO_MODE_DIRECT )
+    return read( pDev -> device.nDevFd, pBuffer, nBufferSize );
+  else
+    return ReadIO( &pDev -> device, pBuffer, nBufferSize );
 }
 
 /**
  * Write data to a serial device.
+ * @param nMode The function operation mode (SERIAL_IO_MODE_DIRECT or
+ * SERIAL_IO_MODE_BUFFERED);
  * @param pDev Pointer to an opened serial device handler;
  * @param pBuffer Pointer to a buffer containing the data to send;
  * @param nBufferSize The Buffer size;
  */
-int WriteSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize ) {
+int WriteSerial( int nMode,
+                 struct stSerialDevice *pDev,
+                 void *pBuffer,
+                 int nBufferSize ) {
 
-  return WriteIO( &pDev -> device, pBuffer, nBufferSize );
+  if( nMode == SERIAL_IO_MODE_DIRECT )
+    return write( pDev -> device.nDevFd, pBuffer, nBufferSize );
+  else
+    return WriteIO( &pDev -> device, pBuffer, nBufferSize );
 }
 
 /**
@@ -193,8 +210,8 @@ void ResetSerialDevice( struct stSerialDevice *pDev )  {
   pDev -> pReceiveSerialFn = NULL;
   pDev -> device.nIsOpen = 0;
   pDev -> device.nDevFd  = -1;
-  pDev -> device.nReadTimeout  = 10000;
-  pDev -> device.nWriteTimeout = 10000;
+  pDev -> device.nReadTimeout  = __DEFAULT_IO_TIMEOUT;
+  pDev -> device.nWriteTimeout = __DEFAULT_IO_TIMEOUT;
   pDev -> device.pReadIOFn  = NULL;
   pDev -> device.pWriteIOFn = NULL;
   memset( pDev -> device.szDeviceFileName, 0, PATH_MAX );

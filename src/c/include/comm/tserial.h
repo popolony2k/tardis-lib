@@ -130,6 +130,13 @@
 #define    STOP_BITS_2             1
 
 /**
+ * I/O mode for @see ReadSerial and @see WriteSerial
+ */
+#define    SERIAL_IO_MODE_DIRECT   0     /* Direct I/O mode */
+#define    SERIAL_IO_MODE_BUFFERED 1     /* Buffered I/O mode */
+
+
+/**
   * Module Callback definitions
   */
 /* Event handling callback */
@@ -171,8 +178,14 @@ extern "C" {
   int CloseSerial( struct stSerialDevice *pDev );
   int IsSerialOpen( struct stSerialDevice *pDev );
 
-  int ReadSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize );
-  int WriteSerial( struct stSerialDevice *pDev, void *pBuffer, int nBufferSize );
+  int ReadSerial( int nMode,
+                  struct stSerialDevice *pDev,
+                  void *pBuffer,
+                  int nBufferSize );
+  int WriteSerial( int nMode,
+                   struct stSerialDevice *pDev,
+                   void *pBuffer,
+                   int nBufferSize );
 
   void WaitForEvents( struct stSerialDevice *pDev );
   void ResetSerial( struct stSerialDevice *pDev );

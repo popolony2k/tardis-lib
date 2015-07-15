@@ -39,8 +39,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <unistd.h>
-
 
 /**
  * Event handler for serial OnReceive callback.
@@ -52,7 +50,7 @@ void OnSerialRead( void *pDev )  {
   char pData[1024];
 
   memset( pData, 0, 1024 );
-  int nRead = read( pSerialDev -> device.nDevFd, pData, 1023 );
+  int nRead = ReadSerial( SERIAL_IO_MODE_BUFFERED, pSerialDev, pData, 1023 );
 
   printf( "OnSerialRead() - Event received %d - [%s]\n", nRead, pData );
 }
