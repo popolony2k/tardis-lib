@@ -50,7 +50,7 @@ void OnSerialRead( void *pDev )  {
   char pData[1024];
 
   memset( pData, 0, 1024 );
-  int nRead = ReadDelim( &pSerialDev -> device, pData, 1023, "\n\n" );
+  int nRead = ReadDelim( &pSerialDev -> device, pData, 1023, "\n" );
 
   printf( "OnSerialRead() - Event received %d - %s", nRead, pData );
 }
