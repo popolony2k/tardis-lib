@@ -50,7 +50,7 @@ void OnSerialRead( void *pDev )  {
   char pData[1024];
 
   memset( pData, 0, 1024 );
-  int nRead = ReadDelim( &pSerialDev -> device, pData, 1023, "\n" );
+  int nRead = ReadDelim( &pSerialDev -> device, pData, 1023, "\n\n" );
 
   printf( "OnSerialRead() - Event received %d - %s", nRead, pData );
 }
@@ -63,6 +63,7 @@ void InitSerialDevice( struct stSerialDevice *pDev )  {
 
   ResetSerial( pDev );
   pDev -> device.pOnReceiveFn = OnSerialRead;
+  //pDev -> serialOptions.nSpeed = BRATE_4800;
   strcpy( pDev -> device.szDeviceFileName, "/dev/rfcomm4" );
 }
 

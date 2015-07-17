@@ -39,6 +39,7 @@
 #define __TSERIAL_H__
 
 #include "comm/tcommtypes.h"
+#include <termios.h>
 
 
 /**

@@ -37,7 +37,6 @@
 #include "comm/tserial.h"
 #include "comm/tbaseio.h"
 #include <sys/stat.h>
-#include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
