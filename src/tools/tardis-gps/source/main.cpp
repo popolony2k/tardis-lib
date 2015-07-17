@@ -63,7 +63,6 @@ void InitSerialDevice( struct stSerialDevice *pDev )  {
 
   ResetSerial( pDev );
   pDev -> device.pOnReceiveFn = OnSerialRead;
-  //pDev -> serialOptions.nSpeed = BRATE_4800;
   strcpy( pDev -> device.szDeviceFileName, "/dev/rfcomm4" );
 }
 
