@@ -37,7 +37,41 @@
 #ifndef __TNMEA0183_H__
 #define __TNMEA0183_H__
 
-
+/* Talker identifiers */
+#define TI_AG  "AG" /* Autopilot - General */
+#define TI_AP  "AP" /* Autopilot - Magnetic */
+#define TI_CD  "CD" /* Communications – Digital Selective Calling (DSC) */
+#define TI_CR  "CR" /* Communications – Receiver / Beacon Receiver */
+#define TI_CS  "CS" /* Communications – Satellite */
+#define TI_CT  "CT" /* Communications – Radio-Telephone (MF/HF) */
+#define TI_CV  "CV" /* Communications – Radio-Telephone (VHF) */
+#define TI_CX  "CX" /* Communications – Scanning Receiver */
+#define TI_DF  "DF" /* Direction Finder */
+#define TI_EC  "EC" /* Electronic Chart Display & Information System (ECDIS) */
+#define TI_EP  "EP" /* Emergency Position Indicating Beacon (EPIRB) */
+#define TI_ER  "ER" /* Engine Room Monitoring Systems */
+#define TI_GP  "GP" /* Global Positioning System (GPS) */
+#define TI_HC  "HC" /* Heading – Magnetic Compass */
+#define TI_HE  "HE" /* Heading – North Seeking Gyro */
+#define TI_HN  "HN" /* Heading – Non North Seeking Gyro */
+#define TI_II  "II" /* Integrated Instrumentation */
+#define TI_IN  "IN" /* Integrated Navigation */
+#define TI_LC  "LC" /* Loran C */
+#define TI_P   "P"  /* Proprietary Code */
+#define TI_RA  "RA" /* RADAR and/or ARPA */
+#define TI_SD  "SD" /* Sounder, Depth */
+#define TI_SN  "SN" /* Electronic Positioning System, other/general */
+#define TI_SS  "SS" /* Sounder, Scanning */
+#define TI_TI  "TI" /* Turn Rate Indicator */
+#define TI_VD  "VD" /* Velocity Sensor, Doppler, other/general */
+#define TI_DM  "DM" /* Velocity Sensor, Speed Log, Water, Magnetic */
+#define TI_VW  "VW" /* Velocity Sensor, Speed Log, Water, Mechanical */
+#define TI_WI  "WI" /* Weather Instruments */
+#define TI_YX  "YX" /* Transducer */
+#define TI_ZA  "ZA" /* Timekeeper – Atomic Clock */
+#define TI_ZC  "ZC" /* Timekeeper – Chronometer */
+#define TI_ZQ  "ZQ" /* Timekeeper – Quartz */
+#define TI_ZV  "ZV" /* Timekeeper – Radio Update, WWV or WWVH */
 
 
 #endif /* __TNMEA0183_H__ */
